@@ -1,0 +1,45 @@
+from __future__ import print_function
+from netmiko import ConnectHandler
+
+import sys
+
+un = input("Username:")
+pwd = input("Password:")
+
+platform = 'cisco_ios'
+username = 'un'
+password = 'pwd'
+
+# DEVICES
+with open('pmia_switches.txt') as f:
+	hosts = f.read().splitlines()
+print(hosts)
+
+# CODE EXECUTION
+switches_results = open(r'switches_results.txt', 'w')
+old_stdout = sys.stdout
+sys.stdout = switches_results
+for host in hosts:
+	net_connect = ConnectHandler(device_type=platform, ip=host, username=username, password=password)
+	print(host)
+	print('##############################################################')
+	print('...CISCO COMMAND SHOW MAC ADDRESS-TABLE OUTPUT START......')
+	output = net_connect.send_command('terminal length 0')
+	print(output)
+	print('##############################################################')
+	print('...SHOW RUNNING CONFIGURATION......')
+	output = net_connect.send_command('show run')
+	print(output)
+	print('...END RUNNING CONFIGURATION......')
+	print('...SHOW INTERFACE CONFIGURATION......')
+	output = net_connect.send_command('show ip interface brief')
+	print(output)
+	print('...END INTERFACE CONFIGURATION......')
+	print(output)
+	print('...CISCO COMMAND SHOW MAC ADDRESS-TABLE OUTPUT END......')
+	output = net_connect.send_command('show mac address-table')
+	print(output)
+	print('...CISCO COMMAND SHOW MAC ADDRESS-TABLE OUTPUT END......')
+switches_results.close()
+
+exit()
